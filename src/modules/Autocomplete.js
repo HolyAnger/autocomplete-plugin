@@ -1,5 +1,6 @@
 import { getDomBySelector, getHtmlFromString } from '@/utils';
 import Input from '@/modules/Input';
+import List from '@/modules/List';
 
 class Autocomplete {
 	constructor(options = {}) {
@@ -8,7 +9,7 @@ class Autocomplete {
 		};
 
 		this.options = {...this.defaultOptions, ...options};
-		this.requiredOptions = ['root'];
+		this.requiredOptions = ['root', 'data'];
 
 		this.checkRequiredOptionsAndInit();
 	}
@@ -19,28 +20,36 @@ class Autocomplete {
 	}
 
 	onInput(e) {
-		console.log(e.target.value);
+		const value = e.target.value.trim();
+		const { data } = this.options;
+		const { list } = data;
+
+		const acData = value ?
+			list.filter(valueList => valueList.includes(value)) :
+			[];
+
+		this.list.renderList(value, acData);
 	}
 
 	createAutocompleteHtml(domEl) {
 		const parentDomEl = domEl.parentNode;
-		const keysToAppend = ['input'];
+		const keysToAppend = ['input', 'list'];
 
-		this.input = new Input(this.options.placeholder);
+		this.input = new Input(this.options.placeholder, this.onInput.bind(this));
+		this.list = new List();
 
 		const html = getHtmlFromString(`
 			<div class="autocomplete-wrapper">
 				<div class="input-wrapper" data-ui="input"></div>
-			</div>		
+				<div class="autocomplete-list-wrapper" data-ui="list"></div>
+			</div>
 		`);
 
 		keysToAppend.forEach(key => {
 			const wrapper = html.querySelector(`[data-ui=${key}]`);
 			wrapper.removeAttribute('data-ui');
-			wrapper.appendChild(this[key]);
+			wrapper.appendChild(this[key].getDom());
 		});
-
-		this.input.oninput = this.onInput;
 
 		parentDomEl.replaceChild(html, domEl);
 	}

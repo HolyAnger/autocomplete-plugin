@@ -1,13 +1,17 @@
 import { getHtmlFromString } from '@/utils';
 
 class Input {
-	constructor(placeholder) {
+	constructor(placeholder, onInput = () => {}) {
 		this.placeholder = placeholder;
-
-		return this.getInputEl();
+		this.el = this.generateInputEl();
+		this.el.oninput = onInput;
 	}
 
-	getInputEl() {
+	getDom() {
+		return this.el;
+	}
+
+	generateInputEl() {
 		return getHtmlFromString(`
 			<input type="text" placeholder="${this.placeholder}">
 		`);
