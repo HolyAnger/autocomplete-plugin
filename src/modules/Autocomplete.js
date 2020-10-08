@@ -20,12 +20,18 @@ class Autocomplete {
 	}
 
 	onInput(e) {
-		const value = e.target.value.trim();
+		const value = e.target.value.trim().toLowerCase();
 		const { data } = this.options;
 		const { list } = data;
 
 		const acData = value ?
-			list.filter(valueList => valueList.includes(value)) :
+			list.filter(valueList => {
+				if (typeof valueList === 'string') {
+					return valueList.toLowerCase().includes(value);
+				}
+
+				return valueList.label.toLowerCase().includes(value);
+			}) :
 			[];
 
 		this.list.renderList(value, acData);
