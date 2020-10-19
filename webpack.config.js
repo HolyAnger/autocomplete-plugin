@@ -8,14 +8,7 @@ const isProd = process.env.NODE_ENV === 'production';
 const isDev = !isProd;
 
 const jsLoaders = () => {
-	const loaders = [
-		{
-			loader: 'babel-loader',
-			options: {
-				presets: ['@babel/preset-env']
-			}
-		}
-	];
+	const loaders = [];
 
 	if (isDev) {
 		loaders.push('eslint-loader');
@@ -29,7 +22,7 @@ const filename = ext => isDev ? `bundle.${ext}` : `bundle.[hash].${ext}`;
 module.exports = {
 	context: path.resolve(__dirname, 'src'),
 	mode: 'development',
-	entry: ['@babel/polyfill', './index.js'],
+	entry: ['./index.js'],
 	output: {
 		filename: filename('js'),
 		path: path.resolve(__dirname, 'dist'),

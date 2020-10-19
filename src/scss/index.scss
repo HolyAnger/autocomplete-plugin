@@ -1,0 +1,43 @@
+.autocomplete-wrapper, .autocomplete-wrapper * {
+  box-sizing: border-box;
+}
+
+.input-el {
+  padding: 5px 10px;
+  border-radius: 3px;
+  outline: none;
+  border: 1px solid #cdcdcd;
+  display: block;
+  width: 100%;
+}
+
+.autocomplete-wrapper {
+  width: 100%;
+}
+
+.autocomplete-list {
+  padding: 0;
+  background: #fafafa;
+  margin: 0;
+  border-radius: 0 0 3px 3px;
+  display: none;
+
+  &.show {
+    display: block;
+  }
+
+  &-item, .no-data-list {
+    display: block;
+    padding: 7px 15px;
+    margin-bottom: 5px;
+  }
+
+  &-item {
+    cursor: pointer;
+    transition: all .3s;
+
+    &:hover {
+      background: #e2e2e2;
+    }
+  }
+}

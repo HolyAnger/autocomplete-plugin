@@ -1,8 +1,10 @@
 import { getHtmlFromString } from '@/utils';
 
 class List {
-	constructor(onChoose = () => {}) {
+	constructor(options) {
+		const { onChoose = () => {}, noDataMsg } = options;
 		this.el = this.generateListWrapper();
+		this.noDataMsg = noDataMsg;
 		this.onChoose = onChoose;
 	}
 
@@ -10,11 +12,15 @@ class List {
 		return this.el;
 	}
 
+	toggleVisibility(visible) {
+		this.el.classList[visible ? 'add' : 'remove']('show');
+	}
+
 	renderList(value, data) {
 		this.el.innerHTML = '';
 
 		const action = (value && data.length) || value ? 'add' : 'remove';
-		this.el.parentNode.classList[action]('show');
+		this.toggleVisibility(action);
 
 		if (!data.length && value) {
 			this.el.appendChild(this.getEmptyData());
@@ -28,7 +34,9 @@ class List {
 			let value = null;
 
 			if (typeof valueObj === 'string') {
-				label = valueObj;
+				label = valueObj.charAt(0).toUpperCase() +
+					valueObj.slice(1, valueObj.length);
+
 				value = valueObj.toLowerCase();
 			} else {
 				img = valueObj.img;
@@ -45,7 +53,10 @@ class List {
 				</li>
 			`);
 
-			listItem.onclick = () => this.onChoose(value);
+			listItem.onclick = () => {
+				this.toggleVisibility(false);
+				this.onChoose(value, label);
+			};
 			this.el.appendChild(listItem);
 		});
 	}
@@ -66,7 +77,7 @@ class List {
 
 	getEmptyData() {
 		return getHtmlFromString(`
-			<li class="no-data-list">No data</li>
+			<li class="no-data-list">${this.noDataMsg}</li>
 		`);
 	}
 

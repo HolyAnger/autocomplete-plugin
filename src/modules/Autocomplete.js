@@ -5,7 +5,9 @@ import List from '@/modules/List';
 class Autocomplete {
 	constructor(options = {}) {
 		this.defaultOptions = {
-			placeholder: 'Write something'
+			placeholder: 'Write something',
+			noDataMsg: 'No Data',
+			onChoose: () => {},
 		};
 
 		this.options = {...this.defaultOptions, ...options};
@@ -17,6 +19,14 @@ class Autocomplete {
 	init() {
 		const { root } = this.options;
 		this.createAutocompleteHtml(getDomBySelector(root));
+	}
+
+	getInput() {
+		return this.input.el;
+	}
+
+	getList() {
+		return this.list.el;
 	}
 
 	onInput(e) {
@@ -37,12 +47,28 @@ class Autocomplete {
 		this.list.renderList(value, acData);
 	}
 
+	onChooseItem(value, label) {
+		this.input.setInput(label);
+		this.options.onChoose(value);
+	}
+
 	createAutocompleteHtml(domEl) {
 		const parentDomEl = domEl.parentNode;
 		const keysToAppend = ['input', 'list'];
 
-		this.input = new Input(this.options.placeholder, this.onInput.bind(this));
-		this.list = new List();
+		const { placeholder, noDataMsg } = this.options;
+
+		this.input = new Input({
+			placeholder,
+			onInput: this.onInput.bind(this),
+		});
+
+		this.list = new List({
+			noDataMsg,
+			onChoose: this.onChooseItem.bind(this),
+		});
+
+		this.input.onFocus(() => this.list.toggleVisibility(true));
 
 		const html = getHtmlFromString(`
 			<div class="autocomplete-wrapper">
