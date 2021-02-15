@@ -7,6 +7,8 @@ class Autocomplete {
 		this.defaultOptions = {
 			placeholder: 'Write something',
 			noDataMsg: 'No Data',
+			loader: 'Loading...',
+			apiUrl: null,
 			onChoose: () => {},
 		};
 
@@ -29,10 +31,16 @@ class Autocomplete {
 		return this.list.el;
 	}
 
-	onInput(e) {
+	async onInput(e) {
 		const value = e.target.value.trim().toLowerCase();
 		const { data } = this.options;
-		const { list } = data;
+		let { list = [], url } = data;
+
+		if (url) {
+			this.list.addLoader();
+			const responseData = await fetch(url);
+			list = await responseData.json();
+		}
 
 		const acData = value ?
 			list.filter(valueList => {
@@ -56,7 +64,7 @@ class Autocomplete {
 		const parentDomEl = domEl.parentNode;
 		const keysToAppend = ['input', 'list'];
 
-		const { placeholder, noDataMsg } = this.options;
+		const { placeholder, noDataMsg, loader } = this.options;
 
 		this.input = new Input({
 			placeholder,
@@ -64,6 +72,7 @@ class Autocomplete {
 		});
 
 		this.list = new List({
+			loader,
 			noDataMsg,
 			onChoose: this.onChooseItem.bind(this),
 		});

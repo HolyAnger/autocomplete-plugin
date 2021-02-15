@@ -2,10 +2,23 @@ import { getHtmlFromString } from '@/utils';
 
 class List {
 	constructor(options) {
-		const { onChoose = () => {}, noDataMsg } = options;
+		const { onChoose = () => {}, noDataMsg, loader } = options;
 		this.el = this.generateListWrapper();
+		this.loading = false;
+		this.loader = loader;
 		this.noDataMsg = noDataMsg;
 		this.onChoose = onChoose;
+	}
+
+	getLoader() {
+		return getHtmlFromString(`
+			<li class="loader">${this.loader}</li>
+		`);
+	}
+
+	addLoader() {
+		this.renderList();
+		this.el.appendChild(this.getLoader());
 	}
 
 	getDom() {
@@ -16,10 +29,12 @@ class List {
 		this.el.classList[visible ? 'add' : 'remove']('show');
 	}
 
-	renderList(value, data) {
+	renderList(value, data = []) {
 		this.el.innerHTML = '';
 
-		const action = (value && data.length) || value ? 'add' : 'remove';
+		const action = (value && data.length) ||
+		(value || this.loading) ? 'add' : 'remove';
+
 		this.toggleVisibility(action);
 
 		if (!data.length && value) {
